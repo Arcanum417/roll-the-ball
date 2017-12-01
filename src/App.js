@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import _ from 'lodash';
 import RGL, { WidthProvider } from 'react-grid-layout';
 import './styles.css';
@@ -7,50 +6,56 @@ import './example-styles.css';
 //import './styles-resizable.css';
 const ReactGridLayout = WidthProvider(RGL);
 
-class NoCompactingLayout extends React.PureComponent {
-    static propTypes = {
-        onLayoutChange: PropTypes.func.isRequired
-    };
+const layoutStatic =
+    [
+        {i: 'a', x: 0, y: 0, w: 1, h: 1,},
+        {i: 'b', x: 1, y: 0, w: 1, h: 1},
+        {i: 'c', x: 2, y: 0, w: 1, h: 1},
+        {i: 'd', x: 3, y: 0, w: 1, h: 1,},
+        {i: 'e', x: 0, y: 1, w: 1, h: 1},
+        {i: 'f', x: 1, y: 1, w: 1, h: 1},
+        {i: 'g', x: 2, y: 1, w: 1, h: 1,},
+        {i: 'h', x: 3, y: 1, w: 1, h: 1},
+        {i: 'j', x: 1, y: 2, w: 1, h: 1,},
+        {i: 'k', x: 2, y: 2, w: 1, h: 1},
+        {i: 'l', x: 3, y: 2, w: 1, h: 1},
+        {i: 'm', x: 0, y: 3, w: 1, h: 1,},
+        {i: 'n', x: 1, y: 3, w: 1, h: 1},
+        {i: 'p', x: 3, y: 3, w: 1, h: 1}
+    ];
 
-    static defaultProps = {
-        className: "layout",
-        cols: 4   ,
-        rowHeight: 100,
-        width: 200,
-        isResizable: false,
-        autoSize: false,
-        onLayoutChange: function() {},
-        // This turns off compaction so you can place items wherever.
-        verticalCompact: false,
-        // This turns off rearrangement so items will not be pushed arround.
-        preventCollision: true
-    };
+const originalLayout = getFromLS('layout') || layoutStatic;
+class NoCompactingLayout extends React.PureComponent {
 
     constructor(props) {
         super(props);
 
-        const layout =
-            [
-                {i: 'a', x: 0, y: 0, w: 1, h: 1,},
-                {i: 'b', x: 1, y: 0, w: 1, h: 1},
-                {i: 'c', x: 2, y: 0, w: 1, h: 1},
-                {i: 'd', x: 3, y: 0, w: 1, h: 1,},
-                {i: 'e', x: 0, y: 1, w: 1, h: 1},
-                {i: 'f', x: 1, y: 1, w: 1, h: 1},
-                {i: 'g', x: 2, y: 1, w: 1, h: 1,},
-                {i: 'h', x: 3, y: 1, w: 1, h: 1},
-                {i: 'j', x: 1, y: 2, w: 1, h: 1,},
-                {i: 'k', x: 2, y: 2, w: 1, h: 1},
-                {i: 'l', x: 3, y: 2, w: 1, h: 1},
-                {i: 'm', x: 0, y: 3, w: 1, h: 1,},
-                {i: 'n', x: 1, y: 3, w: 1, h: 1},
-                {i: 'p', x: 3, y: 3, w: 1, h: 1}
-            ];
-        this.state = { layout };
+        var score = 9;
+
+        this.state = {
+            layout: JSON.parse(JSON.stringify(originalLayout))
+        };
+        this.onLayoutChange = this.onLayoutChange.bind(this);
+        this.resetLayout = this.resetLayout.bind(this);
+    }
+
+    resetLayout() {
+        this.setState({
+            layout: layoutStatic
+        });
+        console.log("nope");
     }
 
     onLayoutChange(layout) {
-        this.props.onLayoutChange(layout);
+        console.log("onLayoutChange!", layout);
+        saveToLS('layout', layout);
+        this.setState({layout});
+        //this.props.onLayoutChange(layout);
+
+    }
+
+   onDragStart(thing, thing2, thing3, thing4, thing5, thing6)   {
+        console.log(thing, thing2, thing3, thing4, thing5, thing6);
     }
 
     generateDOM() {
@@ -61,8 +66,18 @@ class NoCompactingLayout extends React.PureComponent {
 
     render() {
         return (
-            <ReactGridLayout layout={this.state.layout} onLayoutChange={this.onLayoutChange}
-                             {...this.props}>
+            <div>
+            <ReactGridLayout layout={this.state.layout}
+                             onLayoutChange={this.onLayoutChange}
+                             cols={4}
+                             rowHeight={100}
+                             maxRows={4}
+                             isResizable={false}
+                             autoSize={true}
+                             compactType={null}
+                             preventCollision={true}
+                             {...this.props}
+            >
                 <div key="a"><span className="text">a</span></div>
                 <div key="b"><span className="text">b</span></div>
                 <div key="c"><span className="text">c</span></div>
@@ -78,7 +93,41 @@ class NoCompactingLayout extends React.PureComponent {
                 <div key="n"><span className="text">n</span></div>
                 <div key="p"><span className="text">p</span></div>
             </ReactGridLayout>
+            <button onClick={this.resetLayout}>Reset Layout</button>
+            </div>
         );
     }
 }
-export default NoCompactingLayout;
+
+function getFromLS(key) {
+    let ls = {};
+    if (global.localStorage) {
+        try {
+            ls = JSON.parse(global.localStorage.getItem('rgl-7')) || {};
+        } catch(e) {/*Ignore*/}
+    }
+    return ls[key];
+}
+
+function saveToLS(key, value) {
+    if (global.localStorage) {
+        global.localStorage.setItem('rgl-7', JSON.stringify({
+            [key]: value
+        }));
+    }
+}
+
+class App extends React.Component {
+    render () {
+        return  (
+            <div>
+                <NoCompactingLayout />
+                    <div>
+
+                        {2+2}
+                    </div>
+            </div>
+        );
+    }
+}
+export default App;
