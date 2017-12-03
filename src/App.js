@@ -50,7 +50,9 @@ class NoCompactingLayout extends React.PureComponent {
         var score = 9;
 
         this.state = {
-            layout: JSON.parse(JSON.stringify(originalLayout))
+            //layout: JSON.parse(JSON.stringify(originalLayout)),
+            items: [],
+            layout: []
         };
         this.onLayoutChange = this.onLayoutChange.bind(this);
         this.resetLayout = this.resetLayout.bind(this);
@@ -65,7 +67,7 @@ class NoCompactingLayout extends React.PureComponent {
 
     onLayoutChange(layout) {
         console.log("onLayoutChange!", layout);
-        saveToLS('layout', layout);
+        //saveToLS('layout', layout);
         this.setState({layout});
         //this.props.onLayoutChange(layout);
 
@@ -74,11 +76,17 @@ class NoCompactingLayout extends React.PureComponent {
    onDragStart(thing, thing2, thing3, thing4, thing5, thing6)   {
         console.log(thing, thing2, thing3, thing4, thing5, thing6);
     }
-
+/*
     generateDOM() {
         return _.map(_.range(this.props.items), function(i) {
             return (<div key={i}><span className="text">{i}</span></div>);
         });
+    }
+*/
+    generateDOM() {
+        console.log("generateDOM");
+        return ([this.generateDOMItem(0, "direct.png", 180),this.generateDOMItem(1, "turn.png", 180),this.generateDOMItem(2, "direct.png", 180),this.generateDOMItem(3, "turn.png", 180)]
+        );
     }
     generateDOMItem(keyp,imageSource,rotate){
         return (
@@ -91,13 +99,49 @@ class NoCompactingLayout extends React.PureComponent {
         var blocks = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('blocks')[0].getElementsByTagName('block');
         sizeH = parseInt(game.getElementsByTagName('size')[0].getElementsByTagName('horizontal')[0].firstChild.nodeValue);
         sizeW = parseInt(game.getElementsByTagName('size')[0].getElementsByTagName('vertical')[0].firstChild.nodeValue);
+        var gameTask = game.getElementsByTagName('task')[0].firstChild.nodeValue;
+        var gameTaskSplitRows = gameTask.split(';');
+        var gameTaskSplit = new Array(gameTaskSplitRows.length);
+        for (var i = 0; i < gameTaskSplitRows.length; i++) {
+            gameTaskSplit[i] = gameTaskSplitRows[i].split(',');
+        }
+
         console.log(blocks);
         console.log(sizeW);
         console.log(sizeH);
+        console.log(gameTaskSplit);
+
         this.setState({
             width: sizeW*100
         });
         this.forceUpdate();
+        var counter = 0;
+        for (var i = 0;i <gameTaskSplit.length;i++)
+        {
+            for (var j = 0;j <gameTaskSplit[i].length;j++)
+            {
+                this.state.items.push(this.generateItem(i,j,counter.toString(),false));//,gameTaskSplit[i][j].toString()
+                counter++;
+            }
+        }
+        console.log(this.state.items);
+        this.setState({
+            layout: this.state.items
+        });
+        console.log(this.generateDOM());
+        this.forceUpdate();
+/*
+        var layoutNew = this.state.layout;
+        this.state.items.push(this.generateItem(4,4,"x",false,"T120"))
+        this.setState({
+            layout: layoutNew
+        });
+        console.log(layoutNew);
+*/
+    }
+
+    generateItem(xI,yI,idI,staticI,typeI) {
+        return {x: xI, y: yI, w: 1, h: 1, i: idI, static: staticI, type: typeI};
     }
 
     render() {
@@ -117,20 +161,7 @@ class NoCompactingLayout extends React.PureComponent {
                              style={{width : sizeW*100}}
                              {...this.props}
             >
-                {this.generateDOMItem("a","box.png",0)}
-                {this.generateDOMItem("b","start.png",180)}
-                {this.generateDOMItem("c","box.png",0)}
-                {this.generateDOMItem("d","box.png",0)}
-                {this.generateDOMItem("e","box.png",0)}
-                {this.generateDOMItem("f","direct.png",0)}
-                {this.generateDOMItem("g","box.png",0)}
-                {this.generateDOMItem("h","box.png",0)}
-                {this.generateDOMItem("j","box.png",0)}
-                {this.generateDOMItem("k","turn.png",0)}
-                {this.generateDOMItem("l","turn.png",180)}
-                {this.generateDOMItem("m","box.png",0)}
-                {this.generateDOMItem("n","turn.png",0)}
-                {this.generateDOMItem("p","finish.png",270)}
+                {this.generateDOM()}
 
 
             </ReactGridLayout>
@@ -147,6 +178,23 @@ class NoCompactingLayout extends React.PureComponent {
 }
 
 /*
+{this.generateDOMItem("0","box.png",0)}
+                {this.generateDOMItem("1","start.png",180)}
+                {this.generateDOMItem("2","box.png",0)}
+                {this.generateDOMItem("3","box.png",0)}
+                {this.generateDOMItem("4","box.png",0)}
+                {this.generateDOMItem("5","direct.png",0)}
+                {this.generateDOMItem("6","box.png",0)}
+                {this.generateDOMItem("7","box.png",0)}
+                {this.generateDOMItem("8","box.png",0)}
+                {this.generateDOMItem("9","turn.png",0)}
+                {this.generateDOMItem("10","turn.png",180)}
+                {this.generateDOMItem("11","box.png",0)}
+                {this.generateDOMItem("12","turn.png",0)}
+                {this.generateDOMItem("13","finish.png",270)}
+                {this.generateDOMItem("14","turn.png",270)}
+                {this.generateDOMItem("15","turn.png",270)}
+
 <button onClick={this.pickGame(document.getElementById("gameNumber").options[document.getElementById("gameNumber").selectedIndex].value)}>LoadGame</button>
 <button onClick={this.resetLayout}>Reset Layout</button>
 <div key="a"><span className="text">a</span></div>
