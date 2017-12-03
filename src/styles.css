@@ -29,6 +29,7 @@
     -o-user-select: none;*/
     user-select: none;
     user-drag: none;
+    pointer-events: none;
 }
 .react-grid-layout {
   position: relative;

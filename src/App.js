@@ -81,7 +81,7 @@ class NoCompactingLayout extends React.PureComponent {
     }
     generateDOMItem(keyp,imageSource,rotate){
         return (
-            <div key={keyp}><img src={"img/" + imageSource } draggable="false" className={"rotate" + rotate + " gridItemImg"} /></div>
+            <div key={keyp}><img src={"img/" + imageSource } className={"rotate" + rotate + " gridItemImg"} /></div>
     )
     }
 
