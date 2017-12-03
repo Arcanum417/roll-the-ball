@@ -33,7 +33,6 @@
 }
 .react-grid-layout {
   position: relative;
-  width: 400px;
   transition: height 200ms ease;
 }
 .react-grid-item {

@@ -4,7 +4,7 @@ import RGL, { WidthProvider } from 'react-grid-layout';
 import './styles.css';
 import './example-styles.css';
 //import './styles-resizable.css';
-const ReactGridLayout = WidthProvider(RGL);
+const ReactGridLayout =  require('react-grid-layout');
 
 var xmlDoc;
 var xhttp = new XMLHttpRequest();
@@ -37,9 +37,10 @@ const layoutStatic =
         {i: 'l', x: 3, y: 2, w: 1, h: 1},
         {i: 'm', x: 0, y: 3, w: 1, h: 1},
         {i: 'n', x: 1, y: 3, w: 1, h: 1},
-        {i: 'p', x: 3, y: 3, w: 1, h: 1, static: true}
+        {i: 'p', x: 3, y: 3, w: 1, h: 1, static: true, type: "D180"}
     ];
-
+var sizeW=4;
+var sizeH=4;
 const originalLayout = getFromLS('layout') || layoutStatic;
 class NoCompactingLayout extends React.PureComponent {
 
@@ -84,20 +85,36 @@ class NoCompactingLayout extends React.PureComponent {
             <div key={keyp}><img src={"img/" + imageSource } className={"rotate" + rotate + " gridItemImg"} /></div>
     )
     }
+    pickGame(gameSelectionIndex){
+        xmlDoc.getElementsByTagName('block');
+        var game = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game')[gameSelectionIndex];
+        var blocks = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('blocks')[0].getElementsByTagName('block');
+        sizeH = parseInt(game.getElementsByTagName('size')[0].getElementsByTagName('horizontal')[0].firstChild.nodeValue);
+        sizeW = parseInt(game.getElementsByTagName('size')[0].getElementsByTagName('vertical')[0].firstChild.nodeValue);
+        console.log(blocks);
+        console.log(sizeW);
+        console.log(sizeH);
+        this.setState({
+            width: sizeW*100
+        });
+        this.forceUpdate();
+    }
 
     render() {
         return (
             <div>
             <ReactGridLayout layout={this.state.layout}
                              onLayoutChange={this.onLayoutChange}
-                             cols={4}
+                             cols={sizeW}
                              rowHeight={100}
-                             maxRows={4}
+                             maxRows={sizeH}
                              isResizable={false}
                              autoSize={true}
                              compactType={null}
                              preventCollision={true}
+                             width={sizeW*100}
                              margin={[0,0]}
+                             style={{width : sizeW*100}}
                              {...this.props}
             >
                 {this.generateDOMItem("a","box.png",0)}
@@ -118,12 +135,20 @@ class NoCompactingLayout extends React.PureComponent {
 
             </ReactGridLayout>
             <button onClick={this.resetLayout}>Reset Layout</button>
+            <select id="gameNumber">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+            <button onClick={() => this.pickGame(document.getElementById("gameNumber").options[document.getElementById("gameNumber").selectedIndex].value)}>LoadGame</button>
             </div>
         );
     }
 }
 
-/*   <button onClick={this.resetLayout}>Reset Layout</button>
+/*
+<button onClick={this.pickGame(document.getElementById("gameNumber").options[document.getElementById("gameNumber").selectedIndex].value)}>LoadGame</button>
+<button onClick={this.resetLayout}>Reset Layout</button>
 <div key="a"><span className="text">a</span></div>
                 <div key="b"><span className="text">b</span></div>
                 <div key="c"><span className="text">c</span></div>
