@@ -6,11 +6,28 @@ import './example-styles.css';
 //import './styles-resizable.css';
 const ReactGridLayout =  require('react-grid-layout');
 
+var xmlDoc;
+var xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        myFunction(this);
+    }
+};
+xhttp.open("GET", "rollTheBall.xml", true);
+xhttp.send();
+
+function myFunction(xml) {
+    xmlDoc = xml.responseXML;
+    console.log(xmlDoc);
+    console.log(xmlDoc.getElementsByTagName("name")[0]);
+}
+
 var sizeW=4;
 var sizeH=4;
-const originalLayout = getFromLS('layout')
+//const originalLayout = getFromLS('layout')
+
 class NoCompactingLayout extends React.PureComponent {
-/*
+
     resolveAfter2Seconds(x) {
         return new Promise(resolve => {
             setTimeout(() => {
@@ -22,19 +39,6 @@ class NoCompactingLayout extends React.PureComponent {
     async componentDidMount() {
         var d = await this.resolveAfter2Seconds(10)
         this.pickGame(0);
-    }
-*/
-    componentDidMount() {
-        var xhttp = new XMLHttpRequest();
-        var self = this
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                self.setState({ xmlDoc: this.responseXML })
-            }
-        };
-        xhttp.open("GET", "rollTheBall.xml", true);
-        xhttp.send();
-        console.log(this.state.xmlDoc);
     }
 
     constructor(props) {
@@ -54,14 +58,14 @@ class NoCompactingLayout extends React.PureComponent {
     onLayoutChange(layout) {
         console.log("onLayoutChange!", layout);
         //saveToLS('layout', layout);
-        this.setState({layout});
+        this.setState({layout: layout});
         //this.props.onLayoutChange(layout);
 
     }
 
     checkWin(gameSelectionIndex)
     {
-        var game = this.state.xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game')[gameSelectionIndex];
+        var game = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game')[gameSelectionIndex];
         var gameSolutions = game.getElementsByTagName('solution')
         for(var i = 0; i < gameSolutions.length; i++) {
 
@@ -72,14 +76,19 @@ class NoCompactingLayout extends React.PureComponent {
             }
 
             console.log(gameSolutionSplit);
-
-            for (var k = 0; k < this.state.layout.length; k++) {
-                for (var l = 0; l < this.state.items.length; l++) {
-                    if (this.state.layout[k].i == this.state.items[l].i) {
-                        this.state.layout[k]
-                        this.state.items[l]
-
-                        //if (gameSolutionSplit[this.state.layout[k].x][this.state.layout[k].y] == )
+            var layout = this.state.layout.concat();
+            var items = this.state.items.concat();
+            console.log(layout,items);
+            for (var k = 0; k < layout.length; k++) {
+                for (var l = 0; l < items.length; l++) {
+                    //console.log(layout[k],k,items[l],l);
+                    if (layout[k].i == items[l].i) {
+                        //layout[k]
+                        //items[l]
+                        //console.log(layout[k],k,items[l],l);
+                        if (gameSolutionSplit[layout[k].y][layout[k].x] == items[l].type) {
+                            console.log(gameSolutionSplit[layout[k].y][layout[k].x],layout[k],k,items[l],l);
+                        }
                     }
                 }
 
@@ -89,7 +98,7 @@ class NoCompactingLayout extends React.PureComponent {
     }
 
     generateDOM() {
-        var items = this.state.items;
+        var items = this.state.items.slice();
 
         var textArray = [
             'direct.png',
@@ -99,7 +108,7 @@ class NoCompactingLayout extends React.PureComponent {
         var randomNumber = Math.floor(Math.random()*textArray.length);
 
         function getOneDOM(item,index){
-            var blocks = this.state.xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('blocks')[0].getElementsByTagName('block');
+            var blocks = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('blocks')[0].getElementsByTagName('block');
             return(this.generateDOMItem(item.i,item.imgSource,item.rotation))
         }
         return(items.map(getOneDOM,this));
@@ -112,10 +121,9 @@ class NoCompactingLayout extends React.PureComponent {
     )
     }
     pickGame(gameSelectionIndex){
-        console.log(this.state.xmlDoc);
-        this.state.xmlDoc.getElementsByTagName('block');
-        var game = this.state.xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game')[gameSelectionIndex];
-        var blocks = this.state.xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('blocks')[0].getElementsByTagName('block');
+        console.log(xmlDoc);
+        var game = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game')[gameSelectionIndex];
+        var blocks = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('blocks')[0].getElementsByTagName('block');
         sizeH = parseInt(game.getElementsByTagName('size')[0].getElementsByTagName('horizontal')[0].firstChild.nodeValue);
         sizeW = parseInt(game.getElementsByTagName('size')[0].getElementsByTagName('vertical')[0].firstChild.nodeValue);
         var gameTask = game.getElementsByTagName('task')[0].firstChild.nodeValue;
@@ -128,10 +136,7 @@ class NoCompactingLayout extends React.PureComponent {
         this.setState({
             width: sizeW*100
         });
-        this.setState({
-            items: []
-        });
-
+        var items = [];
         var counter = 0;
         for (var i = 0;i <gameTaskSplit.length;i++)
         {
@@ -155,13 +160,14 @@ class NoCompactingLayout extends React.PureComponent {
                     var isStatic = false;
                     if (gameTaskSplit[i][j].charAt(0) == "S" || gameTaskSplit[i][j].charAt(0) == "F")
                         isStatic = true;
-                    this.state.items.push(this.generateItem(j,i,counter.toString(),isStatic,gameTaskSplit[i][j].toString(),imgSource,rotation));
+                    items.push(this.generateItem(j,i,counter.toString(),isStatic,gameTaskSplit[i][j].toString(),imgSource,rotation));
                 }
                 counter++;
             }
         }
         this.setState({
-            layout: this.state.items
+            items: items,
+            layout: items
         });
     }
 
@@ -170,7 +176,7 @@ class NoCompactingLayout extends React.PureComponent {
     }
 
     render() {
-        if(this.state.xmlDoc) {
+        if(xmlDoc) {
             return (
                 <div>
                     <ReactGridLayout layout={this.state.layout}
