@@ -75,17 +75,17 @@
     </block>  
     <block>
       <name>E</name>
-      <rotation></rotation>
+      <rotation>0</rotation>
       <img>empty.png</img>
     </block>  
     <block>
       <name>B</name>
-      <rotation></rotation>
+      <rotation>0</rotation>
       <img>box.png</img>
     </block>  
     <block>
       <name>N</name>
-      <rotation></rotation>
+      <rotation>0</rotation>
       <img>not important</img>
     </block>
   </blocks>
@@ -111,7 +111,7 @@
         <vertical>5</vertical>
         <horizontal>5</horizontal>
       </size>
-      <task>E,F180,E,S180,E;E,D0,E,T90,T180;D0,T90,D9,D90,E;T0,E,T90,T270,D0;T270,T270,D0,T90,B</task>
+      <task>E,F180,E,S180,E;E,D0,E,T90,T180;D0,T90,D90,D90,E;T0,E,T90,T270,D0;T270,T270,D0,T90,B</task>
       <solution>N,F180,N,S180,N;N,D0,N,T90,T180;N,T0,D90,D90,T270;N,N,N,N,N;N,N,N,N,N</solution>
       <solution>N,F180,N,S180,N;N,D0,N,T90,T180;N,D0,N,N,D0;N,T0,D90,D90,T270;N,N,N,N,N</solution>
     </game>

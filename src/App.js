@@ -155,9 +155,9 @@ class NoCompactingLayout extends React.PureComponent {
         var randomNumber = Math.floor(Math.random()*textArray.length);
 
         function getOneDOM(item,index){
+            console.log(xmlDoc);
             var blocks = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('blocks')[0].getElementsByTagName('block');
-            console.log(item.type);
-            return(this.generateDOMItem(item.i,textArray[Math.floor(Math.random()*textArray.length)],90))
+            return(this.generateDOMItem(item.i,item.imgSource,item.rotation))
         }
         //console.log("generateDOMReturnValue");
         //console.log(this.generateDOMItem(items[0].i,textArray[Math.floor(Math.random()*textArray.length)],90));
@@ -174,7 +174,7 @@ class NoCompactingLayout extends React.PureComponent {
     pickGame(gameSelectionIndex){
         xmlDoc.getElementsByTagName('block');
         var game = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game')[gameSelectionIndex];
-
+        var blocks = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('blocks')[0].getElementsByTagName('block');
         sizeH = parseInt(game.getElementsByTagName('size')[0].getElementsByTagName('horizontal')[0].firstChild.nodeValue);
         sizeW = parseInt(game.getElementsByTagName('size')[0].getElementsByTagName('vertical')[0].firstChild.nodeValue);
         var gameTask = game.getElementsByTagName('task')[0].firstChild.nodeValue;
@@ -197,14 +197,27 @@ class NoCompactingLayout extends React.PureComponent {
         {
             for (var j = 0;j <gameTaskSplit[i].length;j++)
             {
-                this.state.items.push(this.generateItem(j,i,counter.toString(),false,gameTaskSplit[i][j].toString()));//
+
+
+                var imgSource;
+                var rotation;
+                for (var k = 0; k < blocks.length;k++)
+                {
+                    if (gameTaskSplit[i][j].toString() == blocks[k].getElementsByTagName('name')[0].firstChild.nodeValue)
+                    {
+                        imgSource = blocks[k].getElementsByTagName('img')[0].firstChild.nodeValue;
+                        rotation = blocks[k].getElementsByTagName('rotation')[0].firstChild.nodeValue;
+                        break;
+                    }
+                }
+                if(gameTaskSplit[i][j] != "E")
+                {
+                    var isStatic = false;
+                    if (gameTaskSplit[i][j].charAt(0) == "S" || gameTaskSplit[i][j].charAt(0) == "F")
+                        isStatic = true;
+                    this.state.items.push(this.generateItem(j,i,counter.toString(),isStatic,gameTaskSplit[i][j].toString(),imgSource,rotation));
+                }
                 counter++;
-            }
-        }
-        //remove type empty, we dont need them
-        for(var i = this.state.items.length - 1; i >= 0; i--) {
-            if(this.state.items[i].type === "E") {
-                this.state.items.splice(i, 1);
             }
         }
         this.setState({
@@ -221,8 +234,8 @@ class NoCompactingLayout extends React.PureComponent {
 */
     }
 
-    generateItem(xI,yI,idI,staticI,typeI) {
-        return {i: idI, x: xI, y: yI, w: 1, h: 1, static: staticI, type: typeI};
+    generateItem(xI,yI,idI,staticI,typeI,imgSourceI,rotationI) {
+        return {i: idI, x: xI, y: yI, w: 1, h: 1, static: staticI, type: typeI, imgSource: imgSourceI, rotation: rotationI};
     }
 
     render() {
