@@ -67,6 +67,8 @@ class NoCompactingLayout extends React.PureComponent {
     {
         var game = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game')[gameSelectionIndex];
         var gameSolutions = game.getElementsByTagName('solution')
+        var badSolutions = 0;
+        loopAllSolutions:
         for(var i = 0; i < gameSolutions.length; i++) {
 
             var gameSolutionSplitRows = gameSolutions[i].firstChild.nodeValue.split(';');
@@ -79,6 +81,7 @@ class NoCompactingLayout extends React.PureComponent {
             var layout = this.state.layout.concat();
             var items = this.state.items.concat();
             console.log(layout,items);
+            loopOneSolution:
             for (var k = 0; k < layout.length; k++) {
                 for (var l = 0; l < items.length; l++) {
                     //console.log(layout[k],k,items[l],l);
@@ -86,15 +89,30 @@ class NoCompactingLayout extends React.PureComponent {
                         //layout[k]
                         //items[l]
                         //console.log(layout[k],k,items[l],l);
-                        if (gameSolutionSplit[layout[k].y][layout[k].x] == items[l].type) {
-                            console.log(gameSolutionSplit[layout[k].y][layout[k].x],layout[k],k,items[l],l);
+                        if (gameSolutionSplit[layout[k].y][layout[k].x] == items[l].type || gameSolutionSplit[layout[k].y][layout[k].x] == "N") {
+                            console.log("GUT",gameSolutionSplit[layout[k].y][layout[k].x],layout[k],k,items[l],l);
+                        }
+                        else {
+                            console.log("SHEISE", gameSolutionSplit[layout[k].y][layout[k].x], layout[k], k, items[l], l);
+                            badSolutions++;
+                            break loopOneSolution;
                         }
                     }
                 }
 
             }
-        }
 
+        }
+        if (gameSolutions.length == badSolutions)
+        {
+            alert("NEIN");
+            return 0;
+        }
+        else
+        {
+            alert("JA, du bist richtig !");
+            return 1;
+        }
     }
 
     generateDOM() {
