@@ -63,6 +63,57 @@ class NoCompactingLayout extends React.PureComponent {
 
     }
 
+    checkWin(gameSelectionIndex) {
+        var game = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game')[gameSelectionIndex];
+        var gameSolutions = game.getElementsByTagName('solution')
+        var badSolutions = 0;
+        loopAllSolutions:
+            for (var i = 0; i < gameSolutions.length; i++) {
+
+                var gameSolutionSplitRows = gameSolutions[i].firstChild.nodeValue.split(';');
+                var gameSolutionSplit = new Array(gameSolutionSplitRows.length);
+                for (var j = 0; j < gameSolutionSplitRows.length; j++) {
+                    gameSolutionSplit[j] = gameSolutionSplitRows[j].split(',');
+                }
+
+                console.log(gameSolutionSplit);
+                var layout = this.state.layout.concat();
+                var items = this.state.items.concat();
+                console.log(layout, items);
+                loopOneSolution:
+                for (var k = 0; k < gameSolutionSplit.length; k++){ //k je y
+                    for (var l = 0; l < gameSolutionSplit[k].length; l++) { //l je x
+                        var badSolutionItems = 0;
+                        loopOneSolutionItem:
+                        for (var m = 0; m < layout.length; m++) {
+                            for (var n = 0; n < items.length; n++) {
+                                //console.log(layout[m],m,items[n],n);
+                                if (layout[m].i == items[n].i) {
+                                    if ((gameSolutionSplit[k][l] == "N") || (k == layout[m].y && l == layout[m].x && gameSolutionSplit[k][l] == items[n].type)){
+                                        console.log("GUT",gameSolutionSplit[k][l],k,l,layout[m],m,items[n],n);
+                                        break loopOneSolutionItem;
+                                    }
+                                    else {
+                                        console.log("SHEISEItem",gameSolutionSplit[k][l],k,l,layout[m],m,items[n],n);
+                                        badSolutionItems++;
+                                    }
+                                }
+                            }
+                        }
+                        if (badSolutionItems == items.length) {
+                            alert("NEIN");
+                            return 0;
+                        }
+
+                    }
+                }
+
+            }
+        alert("JA");
+        return 1;
+    }
+
+/*
     checkWin(gameSelectionIndex)
     {
         var game = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game')[gameSelectionIndex];
@@ -114,7 +165,7 @@ class NoCompactingLayout extends React.PureComponent {
             return 1;
         }
     }
-
+*/
     generateDOM() {
         var items = this.state.items.slice();
 
