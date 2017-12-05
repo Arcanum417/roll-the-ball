@@ -353,14 +353,6 @@ class NoCompactingLayout extends React.PureComponent {
 
 
                     </ReactGridLayout>
-                    <select id="gameNumber">
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                    </select>
-
-                    <button onClick={() => this.pickGame(document.getElementById("gameNumber").options[document.getElementById("gameNumber").selectedIndex].value)}>LoadGame</button>
-                    <button onClick={() => this.checkWin(this.state.lastGame)}>CheckWin of LastGame</button>
                     <select id="steps">
                         <option value="1">1</option>
                         <option value="2">2</option>
