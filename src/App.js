@@ -37,30 +37,56 @@ class NoCompactingLayout extends React.PureComponent {
     }
 
     async componentDidMount() {
-        var d = await this.resolveAfter2Seconds(10)
-        this.pickGame(0);
+        var d = await this.resolveAfter2Seconds(10);
+        //this.pickGame(0);
+        this.loadGame();
     }
 
     constructor(props) {
         super(props);
 
-        var score = 9;
+        var score = 0;
 
         this.state = {
             //layout: JSON.parse(JSON.stringify(originalLayout)),
             items: [],
             layout: [],
-            score,
+            history: [],
+            lastGame: 0,
+            won: new Array(10),
+            score
         };
         this.onLayoutChange = this.onLayoutChange.bind(this);
     }
 
     onLayoutChange(layout) {
         console.log("onLayoutChange!", layout);
+        //alert("ONLAYOUTCHANGE");
         //saveToLS('layout', layout);
-        this.setState({layout: layout});
+        this.setState({
+            layout: layout,
+            score: this.state.score+1,
+            history: this.state.history.concat([layout])
+        });
+        var win = this.checkWin(this.state.lastGame);
+        if (win)
+        {
+            alert("No ta ši zrobil totu hru čislo däväť, sry vlastne " + this.state.lastGame);
+            this.pickGame(this.state.lastGame + 1)
+        }
         //this.props.onLayoutChange(layout);
 
+    }
+
+    returnSteps(steps){
+        if (steps < this.state.history.length) {
+            var history = this.state.history.concat();
+
+            this.setState({
+                layout: history[history.length - 1 - steps],
+                score: this.state.score-steps
+            });
+        }
     }
 
     checkWin(gameSelectionIndex) {
@@ -111,12 +137,12 @@ class NoCompactingLayout extends React.PureComponent {
             }
         if (gameSolutions.length == badSolutions)
         {
-            alert("NEIN");
+            //alert("NEIN");
             return 0;
         }
         else
         {
-            alert("JA, du bist richtig !");
+            //alert("JA, du bist richtig !");
             return 1;
         }
     }
@@ -174,6 +200,47 @@ class NoCompactingLayout extends React.PureComponent {
         }
     }
 */
+    saveGame(){
+        localStorage.clear();
+        saveToLS("layout",this.state.layout);
+        saveToLS("history",this.state.history);
+        saveToLS("lastGame",this.state.lastGame);
+        saveToLS("won",this.state.won);
+        saveToLS("score",this.state.score);
+
+    }
+
+    loadGame(){
+        //JSON.parse(JSON.stringify(originalLayout));
+        const layout = getFromLS("layout");
+        const history = getFromLS("history");
+        const lastGame = getFromLS("lastGame");
+        const won = getFromLS("won");
+        const score = getFromLS("score");
+        console.log(layout);
+        console.log(history);
+        console.log(lastGame);
+        console.log(won);
+        console.log(score);
+
+
+
+        if(layout) {
+            this.pickGame(JSON.parse(JSON.stringify(lastGame)));
+            this.setState({
+                layout: JSON.parse(JSON.stringify(layout)),
+                history: JSON.parse(JSON.stringify(history)),
+                lastGame: JSON.parse(JSON.stringify(lastGame)),
+                won: JSON.parse(JSON.stringify(won)),
+                score: JSON.parse(JSON.stringify(score))-1
+            });
+        }
+        else
+        {
+            this.pickGame(0);
+        }
+
+    }
     generateDOM() {
         var items = this.state.items.slice();
 
@@ -197,8 +264,16 @@ class NoCompactingLayout extends React.PureComponent {
             <div key={keyp}><img src={"img/" + imageSource } className={"rotate" + rotate + " gridItemImg"} /></div>
     )
     }
+
     pickGame(gameSelectionIndex){
         console.log(xmlDoc);
+        var games = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game');
+        console.log("ZLO",games, games.length, gameSelectionIndex);
+        if (gameSelectionIndex >= games.length)
+        {
+            alert("ŠI PAN, ŠI TO ZROBIL, zo skore: " + this.state.score);
+            return 0;
+        }
         var game = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game')[gameSelectionIndex];
         var blocks = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('blocks')[0].getElementsByTagName('block');
         sizeH = parseInt(game.getElementsByTagName('size')[0].getElementsByTagName('horizontal')[0].firstChild.nodeValue);
@@ -244,7 +319,10 @@ class NoCompactingLayout extends React.PureComponent {
         }
         this.setState({
             items: items,
-            layout: items
+            layout: items,
+            score: this.state.score-1,
+            lastGame: gameSelectionIndex,
+            history: []
         });
     }
 
@@ -280,8 +358,25 @@ class NoCompactingLayout extends React.PureComponent {
                         <option value="1">1</option>
                         <option value="2">2</option>
                     </select>
-                    <button onClick={() => this.checkWin(document.getElementById("gameNumber").options[document.getElementById("gameNumber").selectedIndex].value)}>CheckWin</button>
+
                     <button onClick={() => this.pickGame(document.getElementById("gameNumber").options[document.getElementById("gameNumber").selectedIndex].value)}>LoadGame</button>
+                    <button onClick={() => this.checkWin(this.state.lastGame)}>CheckWin of LastGame</button>
+                    <select id="steps">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                    <button onClick={() => this.returnSteps(document.getElementById("steps").options[document.getElementById("steps").selectedIndex].value)}>Go x turns back</button>
+                    <button onClick={() => this.saveGame()}>SaveGame</button>
+                    <div>Score: {this.state.score}</div>
+                    <div>Hra cislo: {this.state.lastGame}</div>
                 </div>
             )
         }
@@ -295,7 +390,7 @@ function getFromLS(key) {
     let ls = {};
     if (global.localStorage) {
         try {
-            ls = JSON.parse(global.localStorage.getItem('rgl-7')) || {};
+            ls = JSON.parse(global.localStorage.getItem('rollTheBall_'+ key)) || {};
         } catch(e) {/*Ignore*/}
     }
     return ls[key];
@@ -303,7 +398,7 @@ function getFromLS(key) {
 
 function saveToLS(key, value) {
     if (global.localStorage) {
-        global.localStorage.setItem('rgl-7', JSON.stringify({
+        global.localStorage.setItem('rollTheBall_' + key, JSON.stringify({
             [key]: value
         }));
     }
