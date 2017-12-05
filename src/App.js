@@ -101,16 +101,24 @@ class NoCompactingLayout extends React.PureComponent {
                             }
                         }
                         if (badSolutionItems == items.length) {
-                            alert("NEIN");
-                            return 0;
+                            badSolutions++;
+                            break loopOneSolution;
                         }
 
                     }
                 }
 
             }
-        alert("JA");
-        return 1;
+        if (gameSolutions.length == badSolutions)
+        {
+            alert("NEIN");
+            return 0;
+        }
+        else
+        {
+            alert("JA, du bist richtig !");
+            return 1;
+        }
     }
 
 /*

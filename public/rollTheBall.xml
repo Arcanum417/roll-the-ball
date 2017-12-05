@@ -111,9 +111,9 @@
         <vertical>5</vertical>
         <horizontal>5</horizontal>
       </size>
-      <task>E,F180,E,S180,E;E,D0,E,T90,T180;D0,T90,D90,D90,E;T0,E,T90,T270,D0;T270,T270,D0,T90,B</task>
-      <solution>N,F180,N,S180,N;N,D0,N,T90,T180;N,T0,D90,D90,T270;N,N,N,N,N;N,N,N,N,N</solution>
-      <solution>N,F180,N,S180,N;N,D0,N,T90,T180;N,D0,N,N,D0;N,T0,D90,D90,T270;N,N,N,N,N</solution>
+      <task>E,F180,E,S180,E;E,D0,E,T0,T180;D0,T90,D90,D90,E;T0,E,T90,T270,D0;T270,T270,D0,T90,B</task>
+      <solution>N,F180,N,S180,N;N,D0,N,T0,T180;N,T0,D90,D90,T270;N,N,N,N,N;N,N,N,N,N</solution>
+      <solution>N,F180,N,S180,N;N,D0,N,T0,T180;N,D0,N,N,D0;N,T0,D90,D90,T270;N,N,N,N,N</solution>
     </game>
   </games>
 </rolltheball>  
