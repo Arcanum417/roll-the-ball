@@ -67,7 +67,8 @@ class NoCompactingLayout extends React.PureComponent {
             layout: [],
             history: [],
             lastGame: 0,
-            highScore: 999,
+            games: 0,
+            highScore: 99999,
             score
         };
         this.onLayoutChange = this.onLayoutChange.bind(this);
@@ -241,6 +242,10 @@ class NoCompactingLayout extends React.PureComponent {
 
 
         if(layout) {
+            this.setState({
+                highScore: JSON.parse(JSON.stringify(highScore)),
+                score: JSON.parse(JSON.stringify(score)-JSON.parse(JSON.stringify(history)).length+1)
+            });
             this.pickGame(JSON.parse(JSON.stringify(lastGame)));
             this.setState({
                 layout: JSON.parse(JSON.stringify(layout)),
@@ -256,9 +261,28 @@ class NoCompactingLayout extends React.PureComponent {
             {
                 this.setState({
                     highScore: JSON.parse(JSON.stringify(highScore)),
+
                 });
             }
-            this.pickGame(0);
+            if (score)
+            {
+                this.setState({
+                    score: JSON.parse(JSON.stringify(score)),
+
+                });
+            }
+            if (lastGame)
+            {
+                this.setState({
+                    lastGame: JSON.parse(JSON.stringify(lastGame)),
+
+                });
+                this.pickGame(lastGame);
+            }
+            else
+            {
+                this.pickGame(0);
+            }
         }
 
     }
@@ -296,10 +320,13 @@ class NoCompactingLayout extends React.PureComponent {
             if (this.state.score < this.state.highScore)
             {
                 this.setState({
-                    highScore: JSON.parse(JSON.stringify(this.state.score))
+                    highScore: JSON.parse(JSON.stringify(this.state.score)),
                 });
-                saveToLS("highScore",this.state.highScore);
             }
+            this.pickGame(0);
+            this.setState({score: 0});
+            localStorage.clear();
+            saveToLS("highScore",this.state.highScore);
             return 0;
         }
         var game = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game')[gameSelectionIndex];
@@ -350,8 +377,14 @@ class NoCompactingLayout extends React.PureComponent {
             layout: items,
             score: this.state.score-1,
             lastGame: gameSelectionIndex,
+            games: games.length,
             history: []
         });
+        localStorage.clear();
+        saveToLS("highScore",this.state.highScore);
+        saveToLS("lastGame",this.state.lastGame);
+        saveToLS("score",this.state.score);
+
     }
 
     generateItem(xI,yI,idI,staticI,typeI,imgSourceI,rotationI) {
@@ -381,6 +414,8 @@ class NoCompactingLayout extends React.PureComponent {
 
 
                     </ReactGridLayout>
+                    <button onClick={() => this.returnSteps(this.state.history.length - 1 > 0 ? this.state.history.length - 1:1)}>Reset level</button>
+                    <button onClick={() => {localStorage.clear();saveToLS("highScore",this.state.highScore);window.location.href = '/xx';}} >Reset Game</button>
                     <select id="steps">
                         <option value="1">1</option>
                         <option value="2">2</option>
@@ -397,7 +432,7 @@ class NoCompactingLayout extends React.PureComponent {
                     <button onClick={() => this.saveGame()}>SaveGame</button>
                     <div>HighScore: {this.state.highScore}</div>
                     <div>Score: {this.state.score}</div>
-                    <div>Hra cislo: {this.state.lastGame}</div>
+                    <div>Hra cislo: {this.state.lastGame+1} / {this.state.games}</div>
                 </div>
             )
         }
