@@ -2,7 +2,7 @@
   "name": "roll-the-ball",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/~xlendac/build/",
+  "homepage": "/~xlendac/najsamlepsiprojekt/",
   "dependencies": {
     "react": "^16.1.1",
     "react-dom": "^16.1.1",

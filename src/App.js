@@ -1,9 +1,6 @@
 import React from 'react';
-import _ from 'lodash';
-import RGL, { WidthProvider } from 'react-grid-layout';
 import './styles.css';
 import './example-styles.css';
-//import './styles-resizable.css';
 const ReactGridLayout =  require('react-grid-layout');
 
 var xmlDoc;
@@ -18,13 +15,10 @@ xhttp.send();
 
 function myFunction(xml) {
     xmlDoc = xml.responseXML;
-    console.log(xmlDoc);
-    console.log(xmlDoc.getElementsByTagName("name")[0]);
 }
 
 var sizeW=4;
 var sizeH=4;
-//const originalLayout = getFromLS('layout')
 
 class NoCompactingLayout extends React.PureComponent {
 
@@ -38,7 +32,6 @@ class NoCompactingLayout extends React.PureComponent {
 
     async componentDidMount() {
         var d = await this.resolveAfter2Seconds(10);
-        //this.pickGame(0);
         const layout = getFromLS("layout");
         this.loadGame();
         const history = this.state.history.slice(0, -1);
@@ -62,7 +55,6 @@ class NoCompactingLayout extends React.PureComponent {
         var score = 0;
 
         this.state = {
-            //layout: JSON.parse(JSON.stringify(originalLayout)),
             items: [],
             layout: [],
             history: [],
@@ -75,9 +67,6 @@ class NoCompactingLayout extends React.PureComponent {
     }
 
     onLayoutChange(layout) {
-        console.log("onLayoutChange!", layout);
-        //alert("ONLAYOUTCHANGE");
-        //saveToLS('layout', layout);
         this.setState({
             layout: layout,
             score: this.state.score+1,
@@ -89,7 +78,6 @@ class NoCompactingLayout extends React.PureComponent {
             alert("No ta ši zrobil totu hru čislo däväť, sry vlastne " + this.state.lastGame);
             this.pickGame(this.state.lastGame + 1)
         }
-        //this.props.onLayoutChange(layout);
 
     }
 
@@ -118,10 +106,8 @@ class NoCompactingLayout extends React.PureComponent {
                     gameSolutionSplit[j] = gameSolutionSplitRows[j].split(',');
                 }
 
-                console.log(gameSolutionSplit);
                 var layout = this.state.layout.concat();
                 var items = this.state.items.concat();
-                console.log(layout, items);
                 loopOneSolution:
                 for (var k = 0; k < gameSolutionSplit.length; k++){ //k je y
                     for (var l = 0; l < gameSolutionSplit[k].length; l++) { //l je x
@@ -129,14 +115,11 @@ class NoCompactingLayout extends React.PureComponent {
                         loopOneSolutionItem:
                         for (var m = 0; m < layout.length; m++) {
                             for (var n = 0; n < items.length; n++) {
-                                //console.log(layout[m],m,items[n],n);
                                 if (layout[m].i == items[n].i) {
                                     if ((gameSolutionSplit[k][l] == "N") || (k == layout[m].y && l == layout[m].x && gameSolutionSplit[k][l] == items[n].type)){
-                                        console.log("GUT",gameSolutionSplit[k][l],k,l,layout[m],m,items[n],n);
                                         break loopOneSolutionItem;
                                     }
                                     else {
-                                        console.log("SHEISEItem",gameSolutionSplit[k][l],k,l,layout[m],m,items[n],n);
                                         badSolutionItems++;
                                     }
                                 }
@@ -153,69 +136,13 @@ class NoCompactingLayout extends React.PureComponent {
             }
         if (gameSolutions.length == badSolutions)
         {
-            //alert("NEIN");
             return 0;
         }
         else
         {
-            //alert("JA, du bist richtig !");
             return 1;
         }
     }
-
-/*
-    checkWin(gameSelectionIndex)
-    {
-        var game = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game')[gameSelectionIndex];
-        var gameSolutions = game.getElementsByTagName('solution')
-        var badSolutions = 0;
-        loopAllSolutions:
-        for(var i = 0; i < gameSolutions.length; i++) {
-
-            var gameSolutionSplitRows = gameSolutions[i].firstChild.nodeValue.split(';');
-            var gameSolutionSplit = new Array(gameSolutionSplitRows.length);
-            for (var j = 0; j < gameSolutionSplitRows.length; j++) {
-                gameSolutionSplit[j] = gameSolutionSplitRows[j].split(',');
-            }
-
-            console.log(gameSolutionSplit);
-            var layout = this.state.layout.concat();
-            var items = this.state.items.concat();
-            console.log(layout,items);
-            loopOneSolution:
-            for (var k = 0; k < layout.length; k++) {
-                for (var l = 0; l < items.length; l++) {
-                    //console.log(layout[k],k,items[l],l);
-                    if (layout[k].i == items[l].i) {
-                        //layout[k]
-                        //items[l]
-                        //console.log(layout[k],k,items[l],l);
-                        if (gameSolutionSplit[layout[k].y][layout[k].x] == items[l].type || gameSolutionSplit[layout[k].y][layout[k].x] == "N") {
-                            console.log("GUT",gameSolutionSplit[layout[k].y][layout[k].x],layout[k],k,items[l],l);
-                        }
-                        else {
-                            console.log("SHEISE", gameSolutionSplit[layout[k].y][layout[k].x], layout[k], k, items[l], l);
-                            badSolutions++;
-                            break loopOneSolution;
-                        }
-                    }
-                }
-
-            }
-
-        }
-        if (gameSolutions.length == badSolutions)
-        {
-            alert("NEIN");
-            return 0;
-        }
-        else
-        {
-            alert("JA, du bist richtig !");
-            return 1;
-        }
-    }
-*/
     saveGame(){
         localStorage.clear();
         saveToLS("layout",this.state.layout);
@@ -227,19 +154,11 @@ class NoCompactingLayout extends React.PureComponent {
     }
 
     loadGame(){
-        //JSON.parse(JSON.stringify(originalLayout));
         const layout = getFromLS("layout");
         const history = getFromLS("history");
         const lastGame = getFromLS("lastGame");
         const highScore = getFromLS("highScore");
         const score = getFromLS("score");
-        console.log(layout);
-        console.log(history);
-        console.log(lastGame);
-        console.log(highScore);
-        console.log(score);
-
-
 
         if(layout) {
             this.setState({
@@ -311,9 +230,7 @@ class NoCompactingLayout extends React.PureComponent {
     }
 
     pickGame(gameSelectionIndex){
-        console.log(xmlDoc);
         var games = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game');
-        console.log("ZLO",games, games.length, gameSelectionIndex);
         if (gameSelectionIndex >= games.length)
         {
             alert("ŠI PAN, ŠI TO ZROBIL, zo skore: " + this.state.score);
@@ -415,7 +332,7 @@ class NoCompactingLayout extends React.PureComponent {
 
                     </ReactGridLayout>
                     <button onClick={() => this.returnSteps(this.state.history.length - 1 > 0 ? this.state.history.length - 1:1)}>Reset level</button>
-                    <button onClick={() => {localStorage.clear();saveToLS("highScore",this.state.highScore);window.location.href = '/xx';}} >Reset Game</button>
+                    <button onClick={() => {localStorage.clear();saveToLS("highScore",this.state.highScore);window.location.reload(true);}} >Reset Game</button>
                     <select id="steps">
                         <option value="1">1</option>
                         <option value="2">2</option>
