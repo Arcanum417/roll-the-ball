@@ -39,10 +39,21 @@ class NoCompactingLayout extends React.PureComponent {
     async componentDidMount() {
         var d = await this.resolveAfter2Seconds(10);
         //this.pickGame(0);
+        const layout = getFromLS("layout");
         this.loadGame();
-        this.setState({
-            history: this.state.history.slice(0,-1)
-        });
+        const history = this.state.history.slice(0, -1);
+        if (layout) {
+            this.setState({
+                history: history
+            });
+        }
+        if (layout && history.length == 0)
+        {
+            this.setState({
+            score: this.state.score+1,
+            history: [layout]
+            });
+        }
     }
 
     constructor(props) {
@@ -56,7 +67,7 @@ class NoCompactingLayout extends React.PureComponent {
             layout: [],
             history: [],
             lastGame: 0,
-            won: new Array(10),
+            highScore: 999,
             score
         };
         this.onLayoutChange = this.onLayoutChange.bind(this);
@@ -209,7 +220,7 @@ class NoCompactingLayout extends React.PureComponent {
         saveToLS("layout",this.state.layout);
         saveToLS("history",this.state.history);
         saveToLS("lastGame",this.state.lastGame);
-        saveToLS("won",this.state.won);
+        saveToLS("highScore",this.state.highScore);
         saveToLS("score",this.state.score);
 
     }
@@ -219,12 +230,12 @@ class NoCompactingLayout extends React.PureComponent {
         const layout = getFromLS("layout");
         const history = getFromLS("history");
         const lastGame = getFromLS("lastGame");
-        const won = getFromLS("won");
+        const highScore = getFromLS("highScore");
         const score = getFromLS("score");
         console.log(layout);
         console.log(history);
         console.log(lastGame);
-        console.log(won);
+        console.log(highScore);
         console.log(score);
 
 
@@ -235,12 +246,18 @@ class NoCompactingLayout extends React.PureComponent {
                 layout: JSON.parse(JSON.stringify(layout)),
                 history: JSON.parse(JSON.stringify(history)),
                 lastGame: JSON.parse(JSON.stringify(lastGame)),
-                won: JSON.parse(JSON.stringify(won)),
+                highScore: JSON.parse(JSON.stringify(highScore)),
                 score: JSON.parse(JSON.stringify(score))-1
             });
         }
         else
         {
+            if (highScore)
+            {
+                this.setState({
+                    highScore: JSON.parse(JSON.stringify(highScore)),
+                });
+            }
             this.pickGame(0);
         }
 
@@ -276,6 +293,13 @@ class NoCompactingLayout extends React.PureComponent {
         if (gameSelectionIndex >= games.length)
         {
             alert("ŠI PAN, ŠI TO ZROBIL, zo skore: " + this.state.score);
+            if (this.state.score < this.state.highScore)
+            {
+                this.setState({
+                    highScore: JSON.parse(JSON.stringify(this.state.score))
+                });
+                saveToLS("highScore",this.state.highScore);
+            }
             return 0;
         }
         var game = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game')[gameSelectionIndex];
@@ -371,6 +395,7 @@ class NoCompactingLayout extends React.PureComponent {
                     </select>
                     <button onClick={() => this.returnSteps(document.getElementById("steps").options[document.getElementById("steps").selectedIndex].value)}>Go x turns back</button>
                     <button onClick={() => this.saveGame()}>SaveGame</button>
+                    <div>HighScore: {this.state.highScore}</div>
                     <div>Score: {this.state.score}</div>
                     <div>Hra cislo: {this.state.lastGame}</div>
                 </div>
