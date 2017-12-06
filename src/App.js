@@ -1,6 +1,7 @@
 import React from 'react';
 import './styles.css';
 import './example-styles.css';
+import swal from 'sweetalert2';
 const ReactGridLayout =  require('react-grid-layout');
 
 var xmlDoc;
@@ -75,7 +76,11 @@ class NoCompactingLayout extends React.PureComponent {
         var win = this.checkWin(this.state.lastGame);
         if (win)
         {
-            alert("No ta ši zrobil totu hru čislo däväť, sry vlastne " + this.state.lastGame);
+            swal(
+                'Good job!',
+                'You solved level '+ (this.state.lastGame + 1) + '!',
+                'success'
+            )
             this.pickGame(this.state.lastGame + 1)
         }
 
@@ -233,7 +238,11 @@ class NoCompactingLayout extends React.PureComponent {
         var games = xmlDoc.getElementsByTagName('rolltheball')[0].getElementsByTagName('games')[0].getElementsByTagName('game');
         if (gameSelectionIndex >= games.length)
         {
-            alert("ŠI PAN, ŠI TO ZROBIL, zo skore: " + this.state.score);
+            swal(
+                'Finish!',
+                'You finished it all, score: '+ this.state.score + '!',
+                'success'
+            )
             if (this.state.score < this.state.highScore)
             {
                 this.setState({
@@ -256,11 +265,11 @@ class NoCompactingLayout extends React.PureComponent {
         for (var i = 0; i < gameTaskSplitRows.length; i++) {
             gameTaskSplit[i] = gameTaskSplitRows[i].split(',');
         }
-/*
+
         this.setState({
             width: sizeW*100
         });
-        */
+
         var items = [];
         var counter = 0;
         for (var i = 0;i <gameTaskSplit.length;i++)
