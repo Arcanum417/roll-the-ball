@@ -40,6 +40,9 @@ class NoCompactingLayout extends React.PureComponent {
         var d = await this.resolveAfter2Seconds(10);
         //this.pickGame(0);
         this.loadGame();
+        this.setState({
+            history: this.state.history.slice(0,-1)
+        });
     }
 
     constructor(props) {
@@ -81,10 +84,11 @@ class NoCompactingLayout extends React.PureComponent {
     returnSteps(steps){
         if (steps < this.state.history.length) {
             var history = this.state.history.concat();
-
+            var score = JSON.parse(JSON.stringify(this.state.score)) - steps - 1;
             this.setState({
                 layout: history[history.length - 1 - steps],
-                score: this.state.score-steps
+                score: score,
+                history: this.state.history.slice(0,-steps-1)
             });
         }
     }
