@@ -32,8 +32,9 @@
     pointer-events: none;
 }
 .react-grid-layout {
-  position: relative;
-  transition: height 200ms ease;
+    position: relative;
+    margin:0 auto;
+    transition: height 200ms ease;
 }
 .react-grid-item {
   transition: all 200ms ease;

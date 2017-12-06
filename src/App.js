@@ -26,7 +26,7 @@ class NoCompactingLayout extends React.PureComponent {
         return new Promise(resolve => {
             setTimeout(() => {
                 resolve(x);
-            }, 100);
+            }, 350);
         });
     }
 
@@ -256,10 +256,11 @@ class NoCompactingLayout extends React.PureComponent {
         for (var i = 0; i < gameTaskSplitRows.length; i++) {
             gameTaskSplit[i] = gameTaskSplitRows[i].split(',');
         }
-
+/*
         this.setState({
             width: sizeW*100
         });
+        */
         var items = [];
         var counter = 0;
         for (var i = 0;i <gameTaskSplit.length;i++)
@@ -331,27 +332,38 @@ class NoCompactingLayout extends React.PureComponent {
 
 
                     </ReactGridLayout>
-                    <button onClick={() => this.returnSteps(this.state.history.length - 1 > 0 ? this.state.history.length - 1:1)}>Reset level</button>
-                    <button onClick={() => {localStorage.clear();saveToLS("highScore",this.state.highScore);window.location.reload(true);}} >Reset Game</button>
-                    <select id="steps">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                    </select>
-                    <button onClick={() => this.returnSteps(document.getElementById("steps").options[document.getElementById("steps").selectedIndex].value)}>Go x turns back</button>
-                    <button onClick={() => this.saveGame()}>SaveGame</button>
-                    <div>HighScore: {this.state.highScore}</div>
+                    <div className="btn-group m-2" role="group">
+                        <button className="btn btn-outline-primary" onClick={() => this.returnSteps(this.state.history.length - 1 > 0 ? this.state.history.length - 1:1)}>Reset level</button>
+                        <button className="btn btn-outline-primary" onClick={() => {localStorage.clear();saveToLS("highScore",this.state.highScore);window.location.reload(true);}} >Reset Game</button>
+                        <button className="btn btn-outline-primary" onClick={() => this.returnSteps(1)}>Rollback one turn</button>
+                        <button className="btn btn-outline-primary" onClick={() => this.saveGame()}>Save Game</button>
+                    </div>
+                    <div>Best score: {this.state.highScore}</div>
                     <div>Score: {this.state.score}</div>
-                    <div>Hra cislo: {this.state.lastGame+1} / {this.state.games}</div>
+                    <div>Level: {this.state.lastGame+1} / {this.state.games}</div>
+                    <div>Date: {Date()}</div>
+                    <div>
+                        <button className="btn btn-outline-primary" onClick={() => {localStorage.clear();saveToLS("highScore",document.getElementById('hscore').value);saveToLS("score",document.getElementById('score').value);saveToLS("lastGame",document.getElementById("gameSetting").options[document.getElementById("gameSetting").selectedIndex].value - 1);window.location.reload(true)}}>Set game, score and best score</button>
+                        <select id="gameSetting">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                        <input name="score" type="number" id="score"/>
+                        <input name="hscore" type="number" id="hscore"/>
+                    </div>
                 </div>
             )
+            saveToLS("lastGame",this.state.lastGame);
+            saveToLS("highScore",this.state.highScore);
+            saveToLS("score",this.state.score);
         }
         return (
             "Loading..."
